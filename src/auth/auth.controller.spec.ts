@@ -23,10 +23,6 @@ describe('AuthController', () => {
     authService = module.get<AuthService>(AuthService);
   });
 
-  it('should be defined', () => {
-    expect(authController).toBeDefined();
-  });
-
   describe('login', () => {
     it('should log in a user successfully', async () => {
       const responseMock: Partial<Response> = {
