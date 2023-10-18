@@ -7,5 +7,3 @@ export type userType = {
   createdAt: Date;
   updatedAt: Date;
 };
-
-export type userCreateType = {};
