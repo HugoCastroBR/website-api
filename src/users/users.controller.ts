@@ -1,8 +1,8 @@
 import { Controller, Get, UseGuards, Param, Query } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
-import { JwtAuthGuard } from 'src/auth/auth.guard';
-import { PaginationDTO } from 'src/dtos/pagination';
+import { JwtAuthGuard } from '../auth/auth.guard';
+import { PaginationDTO } from '../dtos/pagination';
 
 @ApiTags('users')
 @ApiBearerAuth()
@@ -18,20 +18,9 @@ export class UsersController {
       Number(pagination.itemsPerPage),
     );
   }
-
   @UseGuards(JwtAuthGuard)
   @Get(':id')
-  async findOne(@Param('id') id: string) {
+  async findOne(@Param('id') id: number) {
     return await this.usersService.findOne(+id);
   }
-
-  // @Patch(':id')
-  // update(@Param('id') id: string, @Body() updateUserDto: UpdateUserDto) {
-  //   return this.usersService.update(+id, updateUserDto);
-  // }
-
-  // @Delete(':id')
-  // remove(@Param('id') id: string) {
-  //   return this.usersService.remove(+id);
-  // }
 }

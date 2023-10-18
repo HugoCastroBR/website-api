@@ -9,19 +9,19 @@ export class UpdateUserDto extends PartialType(CreateUserDto) {
   isAdmin?: boolean;
 
   @ApiProperty({
-    default: false,
+    default: 'John Doe',
     required: false,
   })
   name?: string;
 
   @ApiProperty({
-    default: false,
+    default: 'johndoe@fakemail.com',
     required: false,
   })
   email?: string;
 
   @ApiProperty({
-    default: false,
+    default: 'password',
     required: false,
   })
   password?: string;

@@ -1,8 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { CreateUserDto } from './dto/create-user.dto';
-import { UpdateUserDto } from './dto/update-user.dto';
-import { PrismaService } from 'src/database/prisma.service';
-
+import { PrismaService } from '../database/prisma.service';
 @Injectable()
 export class UsersService {
   constructor(private prisma: PrismaService) {}
@@ -16,7 +14,8 @@ export class UsersService {
   }
 
   async findAll() {
-    return await this.prisma.user.findMany();
+    const users = await this.prisma.user.findMany();
+    return users;
   }
 
   async findAllWithPagination(page: number, limit: number) {
@@ -45,10 +44,6 @@ export class UsersService {
       where: { email },
     });
   }
-
-  // update(id: number, updateUserDto: UpdateUserDto) {
-  //   return `This action updates a #${id} user`;
-  // }
 
   // remove(id: number) {
   //   return `This action removes a #${id} user`;
