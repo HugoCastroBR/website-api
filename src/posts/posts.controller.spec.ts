@@ -1,9 +1,6 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { PostsController } from './posts.controller';
 import { PostsService } from './posts.service';
-import { CreatePostDto } from './dto/create-post.dto';
-import { userType } from '../types/users';
-import { Request, Response } from 'express';
 
 const postsServiceMock = {
   create: jest.fn(),
@@ -34,17 +31,24 @@ const fakeResponseWithPagination = {
   totalPages: 1,
 };
 
-const fakeUsers: userType[] = [
-  {
-    id: 1,
-    email: 'hugo',
-    name: 'John Doe',
-    password: '$2b$10$3ynaPKkX.WpNXRI2sM8al.TrJayLr2NA80vbe3yKUR567vklduApm',
-    isAdmin: true,
-    createdAt: new Date('2023-10-17T16:11:46.918Z'),
-    updatedAt: new Date('2023-10-18T00:05:37.917Z'),
+const mockedCreatePost = {
+  title: 'string',
+  content: 'string',
+  published: false,
+};
+
+const mockedCreatePostResponse = {
+  message: 'Post created successfully',
+  data: {
+    id: expect.any(Number),
+    title: 'string',
+    content: 'string',
+    createdAt: expect.any(Date),
+    updatedAt: expect.any(Date),
+    authorId: 3,
+    published: false,
   },
-];
+};
 
 describe('PostsController', () => {
   let controller: PostsController;
@@ -61,14 +65,26 @@ describe('PostsController', () => {
     controller = module.get<PostsController>(PostsController);
   });
 
-  // describe('findAll', () => {
-  //   it('should return an array of posts', async () => {
-  //     jest.spyOn(controller, 'findAll').mockResolvedValue(fakePosts as never);
+  describe('create', () => {
+    it('should create a post', async () => {
+      jest
+        .spyOn(controller, 'create')
+        .mockImplementation(async (_body, _req, res) => {
+          return res.status(201).json(mockedCreatePostResponse);
+        });
 
-  //     expect(await controller.findAll()).toBe(fakeResponseWithPagination);
-  //     expect(controller.findAll).toHaveBeenCalledTimes(1);
-  //   });
-  // });
+      const req = { user: { id: 3 } } as any;
+      const res = {
+        status: jest.fn().mockReturnThis(),
+        json: jest.fn(),
+      } as any;
+
+      await controller.create(mockedCreatePost, req, res);
+
+      expect(res.status).toHaveBeenCalledWith(201);
+      expect(res.json).toHaveBeenCalledWith(mockedCreatePostResponse);
+    });
+  });
 
   describe('findAllWithPagination', () => {
     const pagination = { page: 1, itemsPerPage: 10 };

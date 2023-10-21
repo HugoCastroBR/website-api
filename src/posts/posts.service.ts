@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { CreatePostDto } from './dto/create-post.dto';
 import { UpdatePostDto } from './dto/update-post.dto';
 import { PrismaService } from '../database/prisma.service';
-import { Request, Response } from 'express';
+import { Request } from 'express';
 
 @Injectable()
 export class PostsService {
@@ -34,7 +34,6 @@ export class PostsService {
         createdAt: 'asc',
       },
     });
-
     const total = await this.prisma.post.count();
     const totalPages = Math.ceil(total / limit);
     const data = posts;

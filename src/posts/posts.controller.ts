@@ -35,7 +35,7 @@ export class PostsController {
     try {
       const userId = req.user['id'];
       const result = await this.postsService.create(createPostDto, req, userId);
-      return response.status(200).json({
+      return response.status(201).json({
         message: 'Post created successfully',
         data: result,
       });
@@ -45,25 +45,49 @@ export class PostsController {
   }
 
   @Get()
-  findAllWithPagination(@Query() pagination: PaginationDTO) {
-    return this.postsService.findAllWithPagination(
-      Number(pagination.page),
-      Number(pagination.itemsPerPage),
-    );
+  async findAllWithPagination(
+    @Query() pagination: PaginationDTO,
+    @Res() response?: Response,
+  ) {
+    try {
+      const res = await this.postsService.findAllWithPagination(
+        Number(pagination.page),
+        Number(pagination.itemsPerPage),
+      );
+      response?.status(200).json(res);
+    } catch (error) {
+      response?.status(400).json({ error: error.message });
+    }
   }
 
   @Get(':id')
-  findOne(@Param('id') id: number) {
-    return this.postsService.findOne(+id);
+  findOne(@Param('id') id: number, @Res() response?: Response) {
+    try {
+      return this.postsService.findOne(+id);
+    } catch (error) {
+      response?.status(400).json({ error: error.message });
+    }
   }
 
   @Patch(':id')
-  update(@Param('id') id: number, @Body() updatePostDto: UpdatePostDto) {
-    return this.postsService.update(+id, updatePostDto);
+  update(
+    @Param('id') id: number,
+    @Body() updatePostDto: UpdatePostDto,
+    @Res() response?: Response,
+  ) {
+    try {
+      return this.postsService.update(+id, updatePostDto);
+    } catch (error) {
+      response?.status(400).json({ error: error.message });
+    }
   }
 
   @Delete(':id')
-  remove(@Param('id') id: number) {
-    return this.postsService.remove(+id);
+  remove(@Param('id') id: number, @Res() response?: Response) {
+    try {
+      return this.postsService.remove(+id);
+    } catch (error) {
+      response?.status(400).json({ error: error.message });
+    }
   }
 }
