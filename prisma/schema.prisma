@@ -25,9 +25,11 @@ model User {
 model Post {
   id        Int      @id @default(autoincrement())
   title     String
+  subtitle  String  @default("No subtitle")
   content   String
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+  imageUrl  String?
   author    User     @relation(fields: [authorId], references: [id])
   authorId  Int
   published Boolean  @default(false)

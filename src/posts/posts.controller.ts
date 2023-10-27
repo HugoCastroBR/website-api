@@ -60,6 +60,25 @@ export class PostsController {
     }
   }
 
+  @Get('/user/:id')
+  async findAllByUser(
+    @Param('id') id: number,
+    @Query() pagination: PaginationDTO,
+    @Req() req: Request,
+    @Res() response?: Response,
+  ) {
+    try {
+      const res = await this.postsService.findAllByUser(
+        Number(pagination.page),
+        Number(pagination.itemsPerPage),
+        Number(id),
+      );
+      response?.status(200).json(res);
+    } catch (error) {
+      response?.status(400).json({ error: error.message });
+    }
+  }
+
   @Get(':id')
   findOne(@Param('id') id: number, @Res() response?: Response) {
     try {
@@ -70,22 +89,24 @@ export class PostsController {
   }
 
   @Patch(':id')
-  update(
+  async update(
     @Param('id') id: number,
     @Body() updatePostDto: UpdatePostDto,
     @Res() response?: Response,
   ) {
     try {
-      return this.postsService.update(+id, updatePostDto);
+      const res = await this.postsService.update(+id, updatePostDto);
+      response?.status(200).json(res);
     } catch (error) {
       response?.status(400).json({ error: error.message });
     }
   }
 
   @Delete(':id')
-  remove(@Param('id') id: number, @Res() response?: Response) {
+  async remove(@Param('id') id: number, @Res() response?: Response) {
     try {
-      return this.postsService.remove(+id);
+      const res = await this.postsService.remove(+id);
+      response?.status(200).json(res);
     } catch (error) {
       response?.status(400).json({ error: error.message });
     }

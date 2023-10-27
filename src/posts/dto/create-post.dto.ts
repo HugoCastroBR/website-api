@@ -12,9 +12,22 @@ export class CreatePostDto {
 
   @ApiProperty({
     required: false,
+    default: '',
+  })
+  @IsOptional()
+  @IsString()
+  imageUrl?: string;
+
+  @ApiProperty({
+    default: 'No subtitle',
+  })
+  @IsString()
+  subtitle: string;
+
+  @ApiProperty({
     default: false,
   })
   @IsString()
   @IsOptional()
-  published: boolean;
+  published?: boolean;
 }

@@ -32,6 +32,7 @@ export class AuthService {
     }
 
     return {
+      user,
       token: this.jwtService.sign({ email }),
     };
   }
@@ -63,8 +64,13 @@ export class AuthService {
       name,
     });
 
+    const userCreated = await this.prismaService.user.findUnique({
+      where: { email },
+    });
+
     return {
       token: this.jwtService.sign({ email }),
+      user: userCreated,
     };
   }
 
