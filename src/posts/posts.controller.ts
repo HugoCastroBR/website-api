@@ -80,9 +80,10 @@ export class PostsController {
   }
 
   @Get(':id')
-  findOne(@Param('id') id: number, @Res() response?: Response) {
+  async findOne(@Param('id') id: number, @Res() response?: Response) {
     try {
-      return this.postsService.findOne(+id);
+      const res = await this.postsService.findOne(+id);
+      response?.status(200).json(res);
     } catch (error) {
       response?.status(400).json({ error: error.message });
     }

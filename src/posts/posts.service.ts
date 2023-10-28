@@ -122,9 +122,48 @@ export class PostsService {
   }
 
   async findOne(id: number) {
-    return await this.prisma.post.findUnique({
+    const res = await this.prisma.post.findUnique({
       where: { id },
+      include: {
+        author: true,
+        comments: {
+          include: {
+            author: {
+              select: {
+                name: true,
+              },
+            },
+          },
+        },
+      },
     });
+
+    const data = {
+      id: res.id,
+      title: res.title,
+      authorId: res.authorId,
+      content: res.content,
+      imageUrl: res.imageUrl,
+      subtitle: res.subtitle,
+      published: res.published,
+      createdAt: res.createdAt,
+      updatedAt: res.updatedAt,
+      authorName: res.author.name,
+      totalComments: res.comments.length,
+      comments: res.comments.map((comment) => {
+        return {
+          id: comment.id,
+          content: comment.content,
+          authorId: comment.authorId,
+          postId: comment.postId,
+          createdAt: comment.createdAt,
+          updatedAt: comment.updatedAt,
+          authorName: comment.author.name,
+        };
+      }),
+    };
+
+    return data;
   }
 
   update(id: number, updatePostDto: UpdatePostDto) {
