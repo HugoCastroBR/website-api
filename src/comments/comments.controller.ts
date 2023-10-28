@@ -21,11 +21,11 @@ import { PaginationDTO } from '../dtos/pagination';
 
 @ApiTags('comments')
 @Controller('comments')
-@ApiBearerAuth()
-@UseGuards(JwtAuthGuard)
 export class CommentsController {
   constructor(private readonly commentsService: CommentsService) {}
 
+  @ApiBearerAuth()
+  @UseGuards(JwtAuthGuard)
   @Post()
   async create(
     @Body() createCommentDto: CreateCommentDto,
@@ -64,16 +64,38 @@ export class CommentsController {
     }
   }
 
+  @Get('post/:postId')
+  async findAllWithPaginationByPostId(
+    @Param('postId') id: number,
+    @Query() pagination: PaginationDTO,
+    @Res() response?: Response,
+  ) {
+    try {
+      const res = await this.commentsService.findAllWithPaginationByPostId(
+        Number(pagination.page),
+        Number(pagination.itemsPerPage),
+        Number(id),
+      );
+      response?.status(200).json(res);
+    } catch (error) {
+      response?.status(400).json({ error: error.message });
+    }
+  }
+
   @Get(':id')
   findOne(@Param('id') id: number) {
     return this.commentsService.findOne(+id);
   }
 
+  @ApiBearerAuth()
+  @UseGuards(JwtAuthGuard)
   @Patch(':id')
   update(@Param('id') id: number, @Body() updateCommentDto: UpdateCommentDto) {
     return this.commentsService.update(+id, updateCommentDto);
   }
 
+  @ApiBearerAuth()
+  @UseGuards(JwtAuthGuard)
   @Delete(':id')
   remove(@Param('id') id: number) {
     return this.commentsService.remove(+id);

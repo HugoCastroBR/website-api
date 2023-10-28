@@ -7,6 +7,7 @@ import {
   Param,
   Patch,
   UseGuards,
+  Get,
 } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { LoginUserDto } from './dto/login-user.dto';
@@ -30,6 +31,26 @@ export class AuthController {
       const result = await this.authService.login(loginUserDto);
       return response.status(200).json({
         message: 'User logged in successfully',
+        data: result,
+      });
+    } catch (error) {
+      response.status(400).json({ error: error.message });
+    }
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
+  @Get('me')
+  async profile(
+    @Res() response: Response,
+    @Req() request: Request,
+  ): Promise<any> {
+    try {
+      const token = request.headers.authorization.split(' ')[1];
+      console.log(token);
+      const result = await this.authService.getUserByToken(token);
+      return response.status(200).json({
+        message: 'User profile fetched successfully',
         data: result,
       });
     } catch (error) {

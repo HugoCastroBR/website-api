@@ -35,15 +35,69 @@ export class CommentsService {
 
   async findAllWithPagination(page: number, limit: number) {
     const comments = await this.prisma.comments.findMany({
+      include: {
+        author: {
+          select: {
+            name: true,
+          },
+        },
+      },
       skip: (page - 1) * limit,
       take: limit,
       orderBy: {
-        createdAt: 'asc',
+        createdAt: 'desc',
       },
     });
     const total = await this.prisma.comments.count();
     const totalPages = Math.ceil(total / limit);
-    const data = comments;
+    const data = comments.map((comment) => {
+      return {
+        id: comment.id,
+        content: comment.content,
+        authorName: comment.author.name,
+        postId: comment.postId,
+        createdAt: comment.createdAt,
+        updatedAt: comment.updatedAt,
+        authorId: comment.authorId,
+      };
+    });
+    return { data, total, page, limit, totalPages };
+  }
+
+  async findAllWithPaginationByPostId(
+    page: number,
+    limit: number,
+    postId: number,
+  ) {
+    const comments = await this.prisma.comments.findMany({
+      where: { postId }, // Filtro fixo
+      include: {
+        author: {
+          select: {
+            name: true,
+          },
+        },
+      },
+      skip: (page - 1) * limit,
+      take: limit,
+      orderBy: {
+        createdAt: 'desc',
+      },
+    });
+    const total = await this.prisma.comments.count({ where: { postId } }); // Filtro fixo para contar
+
+    const totalPages = Math.ceil(total / limit);
+    const data = comments.map((comment) => {
+      return {
+        id: comment.id,
+        content: comment.content,
+        authorName: comment.author.name,
+        postId: comment.postId,
+        createdAt: comment.createdAt,
+        updatedAt: comment.updatedAt,
+        authorId: comment.authorId,
+      };
+    });
     return { data, total, page, limit, totalPages };
   }
 

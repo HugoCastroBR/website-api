@@ -126,14 +126,8 @@ export class PostsService {
       where: { id },
       include: {
         author: true,
-        comments: {
-          include: {
-            author: {
-              select: {
-                name: true,
-              },
-            },
-          },
+        _count: {
+          select: { comments: true },
         },
       },
     });
@@ -149,18 +143,7 @@ export class PostsService {
       createdAt: res.createdAt,
       updatedAt: res.updatedAt,
       authorName: res.author.name,
-      totalComments: res.comments.length,
-      comments: res.comments.map((comment) => {
-        return {
-          id: comment.id,
-          content: comment.content,
-          authorId: comment.authorId,
-          postId: comment.postId,
-          createdAt: comment.createdAt,
-          updatedAt: comment.updatedAt,
-          authorName: comment.author.name,
-        };
-      }),
+      totalComments: res._count.comments,
     };
 
     return data;

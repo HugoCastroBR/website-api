@@ -21,11 +21,11 @@ import { PaginationDTO } from '../dtos/pagination';
 
 @ApiTags('posts')
 @Controller('posts')
-@ApiBearerAuth()
-@UseGuards(JwtAuthGuard)
 export class PostsController {
   constructor(private readonly postsService: PostsService) {}
 
+  @ApiBearerAuth()
+  @UseGuards(JwtAuthGuard)
   @Post()
   async create(
     @Body() createPostDto: CreatePostDto,
@@ -60,6 +60,8 @@ export class PostsController {
     }
   }
 
+  @ApiBearerAuth()
+  @UseGuards(JwtAuthGuard)
   @Get('/user/:id')
   async findAllByUser(
     @Param('id') id: number,
@@ -88,7 +90,8 @@ export class PostsController {
       response?.status(400).json({ error: error.message });
     }
   }
-
+  @ApiBearerAuth()
+  @UseGuards(JwtAuthGuard)
   @Patch(':id')
   async update(
     @Param('id') id: number,
@@ -103,6 +106,8 @@ export class PostsController {
     }
   }
 
+  @ApiBearerAuth()
+  @UseGuards(JwtAuthGuard)
   @Delete(':id')
   async remove(@Param('id') id: number, @Res() response?: Response) {
     try {

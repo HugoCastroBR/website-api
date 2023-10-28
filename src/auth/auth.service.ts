@@ -87,6 +87,13 @@ export class AuthService {
     });
   }
 
+  async getUserByToken(token: string): Promise<any> {
+    const { email } = this.jwtService.verify(token);
+    return await this.prismaService.user.findUnique({
+      where: { email },
+    });
+  }
+
   async updateUser(
     userId: number,
     updateUserDto: UpdateUserDto,

@@ -93,6 +93,7 @@ export class UsersService {
 
   async update(id: number, updateUserDto: UpdateUserDto) {
     const { password, ...updateData } = updateUserDto;
+    console.log(updateUserDto);
     if (password) {
       // Se uma nova senha for fornecida, atualize a senha usando a função updatePassword
       await this.updatePassword(id, password);

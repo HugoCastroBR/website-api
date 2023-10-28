@@ -60,9 +60,10 @@ export class UsersController {
   }
 
   @Get(':id')
-  findOne(@Param('id') id: number, @Res() response?: Response) {
+  async findOne(@Param('id') id: number, @Res() response?: Response) {
     try {
-      return this.usersService.findOne(+id);
+      const user = await this.usersService.findOne(+id);
+      response?.status(200).json(user);
     } catch (error) {
       response?.status(400).json({ error: error.message });
     }
