@@ -34,7 +34,12 @@ export class PostsController {
   ) {
     try {
       const userId = req.user['id'];
-      const result = await this.postsService.create(createPostDto, req, userId);
+      const result = await this.postsService.create(
+        createPostDto,
+        req,
+        userId,
+        response,
+      );
       return response.status(201).json({
         message: 'Post created successfully',
         data: result,
@@ -112,6 +117,10 @@ export class PostsController {
   async remove(@Param('id') id: number, @Res() response?: Response) {
     try {
       const res = await this.postsService.remove(+id);
+      if (res === 'Post not found') {
+        response?.status(404).json({ error: res });
+        return;
+      }
       response?.status(200).json(res);
     } catch (error) {
       response?.status(400).json({ error: error.message });

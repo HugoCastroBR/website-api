@@ -110,6 +110,7 @@ export class AuthService {
     const { email, password, confirmPassword, name, isAdmin } = updateUserDto;
 
     const hashPassword = !!password && (await bcrypt.hash(password, 10));
+    if (!hashPassword) throw new Error('Error hashing password');
 
     if (!hashPassword && password === confirmPassword) {
       return await this.prismaService.user.update({

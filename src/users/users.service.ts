@@ -20,7 +20,10 @@ export class UsersService {
     const hashPassword = await bcrypt.hash(password, 10);
 
     if (!hashPassword) {
-      throw new Error('Error hashing password');
+      return {
+        message: 'Error hashing password',
+        error: true,
+      };
     }
 
     const user = await this.prisma.user.create({
@@ -39,6 +42,12 @@ export class UsersService {
   }
 
   async findAllWithPagination(page: number, limit: number) {
+    if (page < 1) {
+      page = 1;
+    }
+    if (limit < 1) {
+      limit = 1;
+    }
     const users = await this.prisma.user.findMany({
       skip: (page - 1) * limit,
       take: limit,
@@ -93,6 +102,10 @@ export class UsersService {
 
   async update(id: number, updateUserDto: UpdateUserDto) {
     const { password, ...updateData } = updateUserDto;
+    const verifyIfUserExists = await this.findOne(id);
+    if (!verifyIfUserExists) {
+      throw new Error('User not found');
+    }
     console.log(updateUserDto);
     if (password) {
       // Se uma nova senha for fornecida, atualize a senha usando a função updatePassword
@@ -121,10 +134,13 @@ export class UsersService {
   }
 
   async remove(id: number) {
+    const verifyIfUserExists = await this.findOne(id);
+    if (!verifyIfUserExists) {
+      throw new Error('User not found');
+    }
     const user = await this.prisma.user.delete({
       where: { id },
     });
-
     return user;
   }
 }

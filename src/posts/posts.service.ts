@@ -2,14 +2,44 @@ import { Injectable } from '@nestjs/common';
 import { CreatePostDto } from './dto/create-post.dto';
 import { UpdatePostDto } from './dto/update-post.dto';
 import { PrismaService } from '../database/prisma.service';
-import { Request } from 'express';
+import { Request, Response } from 'express';
 
 @Injectable()
 export class PostsService {
   constructor(private prisma: PrismaService) {}
 
-  async create(createPostDto: CreatePostDto, req: Request, id: number) {
+  async create(
+    createPostDto: CreatePostDto,
+    req: Request,
+    id: number,
+    response: Response,
+  ) {
+    const validNewPost = () => {
+      if (!createPostDto.title) {
+        return 'Title is required';
+      }
+      if (!createPostDto.subtitle) {
+        return 'Subtitle is required';
+      }
+      if (!createPostDto.content) {
+        return 'Content is required';
+      }
+
+      if (createPostDto.title.length < 3) {
+        return 'Title must be at least 3 characters';
+      }
+      if (createPostDto.subtitle.length < 3) {
+        return 'Subtitle must be at least 3 characters';
+      }
+
+      return true;
+    };
+
     try {
+      if (validNewPost() != true) {
+        response.status(400).json({ error: validNewPost() });
+        return;
+      }
       const createdPost = await this.prisma.post.create({
         data: {
           ...createPostDto,
@@ -22,11 +52,17 @@ export class PostsService {
       });
       return createdPost;
     } catch (error) {
-      throw new Error(error.message);
+      response.status(400).json({ error: error.message });
     }
   }
 
   async findAllByUser(page: number, limit: number, id: number) {
+    if (page < 1) {
+      page = 1;
+    }
+    if (limit < 1) {
+      limit = 1;
+    }
     const posts = await this.prisma.post.findMany({
       where: {
         authorId: id,
@@ -78,7 +114,12 @@ export class PostsService {
     // });
 
     //pegue também o nome do autor e o total de comentários
-
+    if (page < 1) {
+      page = 1;
+    }
+    if (limit < 1) {
+      limit = 1;
+    }
     const posts = await this.prisma.post.findMany({
       skip: (page - 1) * limit,
       take: limit,
@@ -160,8 +201,15 @@ export class PostsService {
     }
   }
 
-  remove(id: number) {
+  async remove(id: number) {
     try {
+      const verifyPost = await this.prisma.post.findUnique({
+        where: { id },
+      });
+      console.log(verifyPost);
+      if (!verifyPost) {
+        throw new Error('Post not found');
+      }
       return this.prisma.post.delete({
         where: { id },
       });

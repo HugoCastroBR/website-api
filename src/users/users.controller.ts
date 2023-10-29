@@ -55,7 +55,11 @@ export class UsersController {
       );
       response?.status(200).json(res);
     } catch (error) {
-      response?.status(400).json({ error: error.message });
+      if (error.message === 'Page not found') {
+        response?.status(404).json({ error: error.message });
+      } else {
+        response?.status(400).json({ error: error.message });
+      }
     }
   }
 
@@ -65,7 +69,11 @@ export class UsersController {
       const user = await this.usersService.findOne(+id);
       response?.status(200).json(user);
     } catch (error) {
-      response?.status(400).json({ error: error.message });
+      if (error.message === 'User not found') {
+        response?.status(404).json({ error: error.message });
+      } else {
+        response?.status(400).json({ error: error.message });
+      }
     }
   }
 
@@ -79,7 +87,11 @@ export class UsersController {
       const res = await this.usersService.update(+id, updateUserDto);
       response?.status(200).json(res);
     } catch (error) {
-      response?.status(400).json({ error: error.message });
+      if (error.message === 'User not found') {
+        response?.status(404).json({ error: error.message });
+      } else {
+        response?.status(400).json({ error: error.message });
+      }
     }
   }
 
@@ -89,7 +101,11 @@ export class UsersController {
       const res = await this.usersService.remove(+id);
       response?.status(200).json(res);
     } catch (error) {
-      response?.status(400).json({ error: error.message });
+      if (error.message === 'User not found') {
+        response?.status(404).json({ error: error.message });
+      } else {
+        response?.status(400).json({ error: error.message });
+      }
     }
   }
 }
