@@ -58,6 +58,8 @@ export class PostsController {
       const res = await this.postsService.findAllWithPagination(
         Number(pagination.page),
         Number(pagination.itemsPerPage),
+        pagination.orderBy,
+        pagination.order,
       );
       response?.status(200).json(res);
     } catch (error) {

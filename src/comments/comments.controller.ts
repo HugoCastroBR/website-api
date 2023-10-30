@@ -75,6 +75,28 @@ export class CommentsController {
         Number(pagination.page),
         Number(pagination.itemsPerPage),
         Number(id),
+        pagination.orderBy,
+        pagination.order,
+      );
+      response?.status(200).json(res);
+    } catch (error) {
+      response?.status(400).json({ error: error.message });
+    }
+  }
+
+  @Get('user/:userId')
+  async findAllWithPaginationByUserId(
+    @Param('userId') id: number,
+    @Query() pagination: PaginationDTO,
+    @Res() response?: Response,
+  ) {
+    try {
+      const res = await this.commentsService.findAllWithPaginationByUserId(
+        Number(pagination.page),
+        Number(pagination.itemsPerPage),
+        Number(id),
+        pagination.orderBy,
+        pagination.order,
       );
       response?.status(200).json(res);
     } catch (error) {
@@ -97,7 +119,7 @@ export class CommentsController {
   @ApiBearerAuth()
   @UseGuards(JwtAuthGuard)
   @Delete(':id')
-  remove(@Param('id') id: number) {
-    return this.commentsService.remove(+id);
+  async remove(@Param('id') id: number) {
+    return await this.commentsService.remove(+id);
   }
 }

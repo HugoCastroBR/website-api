@@ -41,7 +41,12 @@ export class UsersService {
     return users;
   }
 
-  async findAllWithPagination(page: number, limit: number) {
+  async findAllWithPagination(
+    page: number,
+    limit: number,
+    orderByProp?: string,
+    order?: string,
+  ) {
     if (page < 1) {
       page = 1;
     }
@@ -52,7 +57,7 @@ export class UsersService {
       skip: (page - 1) * limit,
       take: limit,
       orderBy: {
-        createdAt: 'asc',
+        [orderByProp]: order,
       },
       include: {
         posts: true, // Inclui os posts de cada usuário

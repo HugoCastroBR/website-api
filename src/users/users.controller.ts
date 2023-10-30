@@ -52,6 +52,8 @@ export class UsersController {
       const res = await this.usersService.findAllWithPagination(
         Number(pagination.page),
         Number(pagination.itemsPerPage),
+        pagination.orderBy,
+        pagination.order,
       );
       response?.status(200).json(res);
     } catch (error) {

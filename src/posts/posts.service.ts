@@ -104,7 +104,12 @@ export class PostsService {
     return { data, total, page, limit, totalPages };
   }
 
-  async findAllWithPagination(page: number, limit: number) {
+  async findAllWithPagination(
+    page: number,
+    limit: number,
+    orderByProp?: string,
+    order?: string,
+  ) {
     // const posts = await this.prisma.post.findMany({
     //   skip: (page - 1) * limit,
     //   take: limit,
@@ -124,7 +129,7 @@ export class PostsService {
       skip: (page - 1) * limit,
       take: limit,
       orderBy: {
-        createdAt: 'asc',
+        [orderByProp]: order,
       },
       include: {
         _count: {

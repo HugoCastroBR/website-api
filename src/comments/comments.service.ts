@@ -68,6 +68,8 @@ export class CommentsService {
     page: number,
     limit: number,
     postId: number,
+    orderByProp?: string,
+    order?: string,
   ) {
     const comments = await this.prisma.comments.findMany({
       where: { postId }, // Filtro fixo
@@ -81,7 +83,7 @@ export class CommentsService {
       skip: (page - 1) * limit,
       take: limit,
       orderBy: {
-        createdAt: 'desc',
+        [orderByProp]: order,
       },
     });
     const total = await this.prisma.comments.count({ where: { postId } }); // Filtro fixo para contar
@@ -101,6 +103,52 @@ export class CommentsService {
     return { data, total, page, limit, totalPages };
   }
 
+  async findAllWithPaginationByUserId(
+    page: number,
+    limit: number,
+    userId: number,
+    orderByProp?: string,
+    order?: string,
+  ) {
+    const comments = await this.prisma.comments.findMany({
+      where: { authorId: userId }, // Filtro fixo
+      include: {
+        post: {},
+        author: {
+          select: {
+            name: true,
+            id: true,
+          },
+        },
+      },
+      skip: (page - 1) * limit,
+      take: limit,
+      orderBy: {
+        [orderByProp]: order,
+      },
+    });
+
+    const total = await this.prisma.comments.count({
+      where: { authorId: userId },
+    });
+
+    const totalPages = Math.ceil(total / limit);
+    const data = comments.map((comment) => {
+      return {
+        id: comment.id,
+        content: comment.content,
+        authorName: comment.author.name,
+        postId: comment.postId,
+        createdAt: comment.createdAt,
+        updatedAt: comment.updatedAt,
+        authorId: comment.authorId,
+        postTitle: comment.post.title,
+      };
+    });
+
+    return { data, total, page, limit, totalPages };
+  }
+
   findOne(id: number) {
     return this.prisma.comments.findUnique({
       where: { id },
@@ -115,9 +163,9 @@ export class CommentsService {
     });
   }
 
-  remove(id: number) {
+  async remove(id: number) {
     try {
-      this.prisma.comments.delete({
+      await this.prisma.comments.delete({
         where: { id },
       });
       return 'Comment deleted successfully';

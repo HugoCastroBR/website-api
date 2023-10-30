@@ -12,4 +12,16 @@ export class PaginationDTO {
     default: 10,
   })
   itemsPerPage: number;
+
+  @ApiProperty({
+    type: String,
+    default: 'createdAt',
+  })
+  orderBy?: string;
+
+  @ApiProperty({
+    type: String,
+    default: 'asc',
+  })
+  order?: 'asc' | 'desc';
 }
