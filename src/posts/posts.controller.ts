@@ -34,6 +34,10 @@ export class PostsController {
   ) {
     try {
       const userId = req.user['id'];
+      if (!req.user.isAdmin) {
+        response.status(403).json({ error: 'Unauthorized' });
+        return;
+      }
       const result = await this.postsService.create(
         createPostDto,
         req,
@@ -103,8 +107,13 @@ export class PostsController {
   async update(
     @Param('id') id: number,
     @Body() updatePostDto: UpdatePostDto,
-    @Res() response?: Response,
+    @Req() req: Request,
+    @Res() response: Response,
   ) {
+    if (!req.user.isAdmin) {
+      response.status(403).json({ error: 'Unauthorized' });
+      return;
+    }
     try {
       const res = await this.postsService.update(+id, updatePostDto);
       response?.status(200).json(res);
@@ -116,7 +125,15 @@ export class PostsController {
   @ApiBearerAuth()
   @UseGuards(JwtAuthGuard)
   @Delete(':id')
-  async remove(@Param('id') id: number, @Res() response?: Response) {
+  async remove(
+    @Param('id') id: number,
+    @Res() response: Response,
+    @Req() req: Request,
+  ) {
+    if (!req.user.isAdmin) {
+      response.status(403).json({ error: 'Unauthorized' });
+      return;
+    }
     try {
       const res = await this.postsService.remove(+id);
       if (res === 'Post not found') {

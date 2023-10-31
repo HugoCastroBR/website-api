@@ -83,7 +83,8 @@ export class CommentsController {
       response?.status(400).json({ error: error.message });
     }
   }
-
+  @ApiBearerAuth()
+  @UseGuards(JwtAuthGuard)
   @Get('user/:userId')
   async findAllWithPaginationByUserId(
     @Param('userId') id: number,
