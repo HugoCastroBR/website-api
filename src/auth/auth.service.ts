@@ -25,9 +25,13 @@ export class AuthService {
       throw new Error('User not found');
     }
 
+    console.log(password);
+
+    // Compare the entered password with the hashed password in the database
     const validatePassword = await bcrypt.compare(password, user.password);
 
     if (!validatePassword) {
+      console.log('Invalid password');
       throw new Error('Invalid password');
     }
 
@@ -40,38 +44,41 @@ export class AuthService {
   async register(registerUserDto: RegisterUserDto): Promise<any> {
     const { email, password, name, confirmPassword } = registerUserDto;
 
+    // Check if the passwords match
     if (password !== confirmPassword) {
-      throw new Error('Password not match');
+      throw new Error('Passwords do not match');
     }
 
-    const hashPassword = await bcrypt.hash(password, 10);
-
-    if (!hashPassword) {
-      throw new Error('Error hashing password');
-    }
-
-    const existing = await this.prismaService.user.findUnique({
+    // Check if a user with the same email already exists
+    const existingUser = await this.prismaService.user.findUnique({
       where: { email },
     });
 
-    if (existing) {
+    if (existingUser) {
       throw new Error('Email already in use');
     }
 
-    await this.usersService.create({
-      email,
-      password: hashPassword,
-      name,
-    });
+    try {
+      // Hash the password
+      const hashedPassword = await bcrypt.hash(password, 10);
 
-    const userCreated = await this.prismaService.user.findUnique({
-      where: { email },
-    });
+      // Create the new user
+      const newUser = await this.prismaService.user.create({
+        data: {
+          email,
+          password: hashedPassword,
+          name,
+        },
+      });
 
-    return {
-      token: this.jwtService.sign({ email }),
-      user: userCreated,
-    };
+      // Return a token and the newly created user
+      return {
+        token: this.jwtService.sign({ email }),
+        user: newUser,
+      };
+    } catch (error) {
+      throw new Error('Error creating user');
+    }
   }
 
   async updatePassword(email: string, password: string): Promise<any> {
