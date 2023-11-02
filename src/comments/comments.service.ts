@@ -28,7 +28,6 @@ export class CommentsService {
 
       return req;
     } catch (error) {
-      console.log(error);
       throw error; // Optionally, you can rethrow the error to handle it elsewhere
     }
   }
@@ -109,9 +108,16 @@ export class CommentsService {
     userId: number,
     orderByProp?: string,
     order?: string,
+    search?: string,
   ) {
     const comments = await this.prisma.comments.findMany({
-      where: { authorId: userId }, // Filtro fixo
+      where: {
+        authorId: userId,
+        content: {
+          contains: search || '',
+          mode: 'insensitive',
+        },
+      },
       include: {
         post: {},
         author: {
@@ -129,7 +135,13 @@ export class CommentsService {
     });
 
     const total = await this.prisma.comments.count({
-      where: { authorId: userId },
+      where: {
+        authorId: userId,
+        content: {
+          contains: search || '',
+          mode: 'insensitive',
+        },
+      },
     });
 
     const totalPages = Math.ceil(total / limit);

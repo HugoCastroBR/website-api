@@ -25,8 +25,6 @@ export class AuthService {
       throw new Error('User not found');
     }
 
-    console.log(password);
-
     // Compare the entered password with the hashed password in the database
     const validatePassword = await bcrypt.compare(password, user.password);
 

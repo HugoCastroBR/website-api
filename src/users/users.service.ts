@@ -46,6 +46,7 @@ export class UsersService {
     limit: number,
     orderByProp?: string,
     order?: string,
+    search?: string,
   ) {
     if (page < 1) {
       page = 1;
@@ -63,9 +64,42 @@ export class UsersService {
         posts: true, // Inclui os posts de cada usuário
         comments: true, // Inclui os comentários de cada usuário
       },
+      where: {
+        OR: [
+          {
+            name: {
+              contains: search || '',
+              mode: 'insensitive',
+            },
+          },
+          {
+            email: {
+              contains: search || '',
+              mode: 'insensitive',
+            },
+          },
+        ],
+      },
     });
 
-    const total = await this.prisma.user.count();
+    const total = await this.prisma.user.count({
+      where: {
+        OR: [
+          {
+            name: {
+              contains: search || '',
+              mode: 'insensitive',
+            },
+          },
+          {
+            email: {
+              contains: search || '',
+              mode: 'insensitive',
+            },
+          },
+        ],
+      },
+    });
     const totalPages = Math.ceil(total / limit);
     const data = users.map((user) => {
       // Mapeia os dados do usuário, incluindo informações sobre posts e comentários
@@ -111,7 +145,6 @@ export class UsersService {
     if (!verifyIfUserExists) {
       throw new Error('User not found');
     }
-    console.log(updateUserDto);
     if (password) {
       // Se uma nova senha for fornecida, atualize a senha usando a função updatePassword
       await this.updatePassword(id, password);

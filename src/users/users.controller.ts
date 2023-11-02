@@ -54,6 +54,7 @@ export class UsersController {
         Number(pagination.itemsPerPage),
         pagination.orderBy,
         pagination.order,
+        pagination.search,
       );
       response?.status(200).json(res);
     } catch (error) {

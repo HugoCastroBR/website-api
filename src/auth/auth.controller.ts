@@ -47,7 +47,6 @@ export class AuthController {
   ): Promise<any> {
     try {
       const token = request.headers.authorization.split(' ')[1];
-      console.log(token);
       const result = await this.authService.getUserByToken(token);
       return response.status(200).json({
         message: 'User profile fetched successfully',

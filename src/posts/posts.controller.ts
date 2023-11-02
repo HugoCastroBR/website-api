@@ -64,6 +64,7 @@ export class PostsController {
         Number(pagination.itemsPerPage),
         pagination.orderBy,
         pagination.order,
+        pagination.search,
       );
       response?.status(200).json(res);
     } catch (error) {
@@ -85,6 +86,9 @@ export class PostsController {
         Number(pagination.page),
         Number(pagination.itemsPerPage),
         Number(id),
+        pagination.orderBy,
+        pagination.order,
+        pagination.search,
       );
       response?.status(200).json(res);
     } catch (error) {

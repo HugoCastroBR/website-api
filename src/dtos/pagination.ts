@@ -21,7 +21,14 @@ export class PaginationDTO {
 
   @ApiProperty({
     type: String,
-    default: 'asc',
+    default: 'desc',
   })
   order?: 'asc' | 'desc';
+
+  @ApiProperty({
+    type: String,
+    required: false,
+    default: '',
+  })
+  search?: string;
 }

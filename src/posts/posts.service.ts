@@ -56,7 +56,14 @@ export class PostsService {
     }
   }
 
-  async findAllByUser(page: number, limit: number, id: number) {
+  async findAllByUser(
+    page: number,
+    limit: number,
+    id: number,
+    orderByProp?: string,
+    order?: string,
+    search?: string,
+  ) {
     if (page < 1) {
       page = 1;
     }
@@ -66,11 +73,14 @@ export class PostsService {
     const posts = await this.prisma.post.findMany({
       where: {
         authorId: id,
+        title: {
+          contains: search,
+        },
       },
       skip: (page - 1) * limit,
       take: limit,
       orderBy: {
-        createdAt: 'asc',
+        [orderByProp]: order,
       },
     });
     const total = await this.prisma.post.count({
@@ -109,6 +119,7 @@ export class PostsService {
     limit: number,
     orderByProp?: string,
     order?: string,
+    search?: string,
   ) {
     // const posts = await this.prisma.post.findMany({
     //   skip: (page - 1) * limit,
@@ -139,9 +150,42 @@ export class PostsService {
           select: { name: true },
         },
       },
+      where: {
+        OR: [
+          {
+            title: {
+              contains: search || '',
+              mode: 'insensitive',
+            },
+          },
+          {
+            subtitle: {
+              contains: search || '',
+              mode: 'insensitive',
+            },
+          },
+        ],
+      },
     });
 
-    const total = await this.prisma.post.count();
+    const total = await this.prisma.post.count({
+      where: {
+        OR: [
+          {
+            title: {
+              contains: search || '',
+              mode: 'insensitive',
+            },
+          },
+          {
+            subtitle: {
+              contains: search || '',
+              mode: 'insensitive',
+            },
+          },
+        ],
+      },
+    });
     const totalPages = Math.ceil(total / limit);
     const data = posts.map((post) => {
       return {
