@@ -8,7 +8,6 @@ import {
 
 describe('HealthController', () => {
   let controller: HealthController;
-
   const healthCheckServiceMock = {
     check: jest.fn(),
   };
